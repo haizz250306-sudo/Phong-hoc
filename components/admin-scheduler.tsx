@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Sparkles,
   ArrowRight,
+  PlusCircle,
   Trash2,
   RotateCcw,
   Sun,
@@ -85,6 +86,29 @@ export function AdminScheduler() {
   function handleResetData() {
     setClasses(createInitialClasses())
     setResult(null)
+  }
+
+  // Xếp thủ công 1 lớp bị đẩy ra ngoài vào phòng đủ điều kiện đã chọn.
+  function handlePlaceClass(cls: ClassInfo, alt: AltSlot) {
+    setClasses((prev) => prev.map((c) => (c.id === cls.id ? { ...c, day: alt.day, shift: alt.shift } : c)))
+    setResult((prev) => {
+      if (!prev) return prev
+      return {
+        assignments: [
+          ...prev.assignments,
+          {
+            classId: cls.id,
+            roomId: alt.roomId,
+            day: alt.day,
+            shift: alt.shift,
+            startPeriod: alt.startPeriod,
+            endPeriod: alt.endPeriod,
+          },
+        ],
+        unassigned: prev.unassigned.filter((u) => u.classInfo.id !== cls.id),
+      }
+    })
+    setSelectedDay(alt.day)
   }
 
   const dayAssignments = useMemo(() => {
